@@ -143,3 +143,45 @@ All other logic, tokenizer settings and corpus files remained unchanged.
 Removing lowercasing affected the English benchmark but had no measurable effect on Hindi.
 
 This demonstrates that the preprocessing step is language-dependent. While the numerical effect on this sample corpus is modest, it changes the reported cross-language fertility ratio and should therefore be documented when interpreting the benchmark.
+
+## Experiment 3 – Comparing GPT-2 and XLM-Roberta
+
+### Question
+
+Does the observed English–Hindi tokenization disparity depend on the tokenizer used?
+
+### Hypothesis
+
+Since GPT-2 was primarily designed for English, a multilingual tokenizer such as XLM-Roberta should reduce the observed disparity.
+
+### Method
+
+Implemented a new comparison script (`compare_tokenizers.py`).
+
+The script:
+- Evaluates the same English and Hindi corpora.
+- Uses two tokenizers:
+  - GPT-2
+  - XLM-Roberta
+- Computes:
+  - Tokens per word
+  - Tokens per character
+
+### Results
+
+| Tokenizer | English (Tok/Word) | Hindi (Tok/Word) | Hindi / English |
+|-----------|-------------------:|-----------------:|----------------:|
+| GPT-2 | 1.23 | 7.52 | 6.11× |
+| XLM-Roberta | 1.24 | 1.44 | 1.16× |
+
+### Observations
+
+The large disparity reported by the original benchmark is greatly reduced when using a multilingual tokenizer.
+
+GPT-2 produces approximately six times more tokens per word for Hindi than English, whereas XLM-Roberta produces only a modest increase.
+
+### Conclusion
+
+The measured language disparity depends strongly on the tokenizer used.
+
+Therefore, conclusions about multilingual tokenization quality should not be drawn from a single tokenizer alone.
