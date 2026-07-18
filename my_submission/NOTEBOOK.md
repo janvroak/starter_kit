@@ -75,3 +75,39 @@ Hindi is **5.89×** the fertility of English.
 ### Conclusion
 
 The original benchmark is reproducible using the supplied script and sample data. Future experiments will use these values as the baseline for comparison.
+
+## Experiment 1 – Sentence Average vs Corpus Average
+
+### Question
+
+Does averaging fertility per sentence produce different benchmark values than computing fertility over the entire corpus?
+
+### Hypothesis
+
+If sentence lengths vary, averaging sentence-level fertility may introduce bias.
+
+### Method
+
+Copied the original script and modified only the aggregation logic.
+
+Original:
+Average of sentence-level fertility.
+
+Modified:
+Total tokens divided by total words across the corpus.
+
+No other changes were made.
+
+### Results
+
+| Metric | Original | Modified |
+|--------|---------:|---------:|
+| English Fertility | 1.27 | 1.25 |
+| Hindi Fertility | 7.45 | 7.40 |
+| Hindi/English Ratio | 5.89× | 5.91× |
+
+### Conclusion
+
+The aggregation strategy changes the reported values, but the effect is small on the supplied sample corpus.
+
+This suggests that sentence-level averaging is not the primary reason for the large English–Hindi difference observed in the benchmark.
