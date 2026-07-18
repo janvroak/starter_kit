@@ -111,3 +111,35 @@ No other changes were made.
 The aggregation strategy changes the reported values, but the effect is small on the supplied sample corpus.
 
 This suggests that sentence-level averaging is not the primary reason for the large English–Hindi difference observed in the benchmark.
+
+## Experiment 2 – Effect of Lowercasing
+
+### Question
+
+Does converting all text to lowercase influence the tokenizer fertility comparison?
+
+### Hypothesis
+
+Lowercasing may affect English while having little or no effect on Indic languages because most Indic scripts do not distinguish uppercase and lowercase.
+
+### Method
+
+A copy of the original benchmark script was created.
+
+Only the `line.lower()` preprocessing step was removed.
+
+All other logic, tokenizer settings and corpus files remained unchanged.
+
+### Results
+
+| Metric | Original | Without Lowercasing |
+|--------|---------:|--------------------:|
+| English Fertility | 1.27 | 1.23 |
+| Hindi Fertility | 7.45 | 7.45 |
+| Hindi/English Ratio | 5.89× | 6.06× |
+
+### Conclusion
+
+Removing lowercasing affected the English benchmark but had no measurable effect on Hindi.
+
+This demonstrates that the preprocessing step is language-dependent. While the numerical effect on this sample corpus is modest, it changes the reported cross-language fertility ratio and should therefore be documented when interpreting the benchmark.
