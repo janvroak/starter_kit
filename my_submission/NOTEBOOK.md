@@ -185,3 +185,106 @@ GPT-2 produces approximately six times more tokens per word for Hindi than Engli
 The measured language disparity depends strongly on the tokenizer used.
 
 Therefore, conclusions about multilingual tokenization quality should not be drawn from a single tokenizer alone.
+# Experiment 5 – Building a Larger Multilingual Evaluation Corpus
+
+## Objective
+
+The provided sample corpus contains only around ten sentences, which is too small to draw reliable conclusions about tokenizer behaviour across languages. The objective of this experiment was to construct a larger multilingual evaluation corpus while keeping the evaluation methodology unchanged.
+
+## Dataset
+
+**Corpus:** FLORES-200
+
+**Languages:**
+- English
+- Hindi
+- Kannada
+- Tamil
+
+**Corpus Size:**
+- 100 parallel sentences per language
+- 400 sentences in total
+
+## Why FLORES-200?
+
+FLORES-200 is a professionally translated multilingual benchmark consisting of parallel sentences across many languages. Using a parallel corpus ensures that tokenizer statistics are compared on approximately equivalent semantic content rather than unrelated text.
+
+## Preprocessing
+
+- UTF-8 encoded text
+- One sentence per line
+- Original text preserved
+- Empty lines ignored during analysis
+- No additional normalization or cleaning performed
+
+## Limitations
+
+Although substantially larger than the provided sample corpus, 100 sentences per language is still a relatively small evaluation set. The corpus also represents only the domains included in FLORES-200. Therefore, the reported tokenizer statistics should be interpreted as comparative measurements for this corpus rather than universal estimates of tokenizer behaviour across all text.
+
+# Experiment 6 – Tokenizer Comparison on FLORES-200
+
+## Objective
+
+Repeat the tokenizer comparison using the larger FLORES-200 corpus while keeping the analysis pipeline identical to the previous experiments.
+
+## Method
+
+The comparison script was updated to support multiple corpora using the `--corpus` command-line argument. The same implementation was executed on both the original sample corpus and the FLORES-200 corpus without changing the analysis logic.
+
+Two tokenizers were evaluated:
+
+- GPT-2
+- XLM-Roberta
+
+Three normalization metrics were computed:
+
+- Tokens per Word
+- Tokens per Character (Unicode code points)
+- Tokens per UTF-8 Byte
+
+## Results
+
+### GPT-2
+
+| Language | Tok/Word | Tok/Char | Tok/Byte |
+|----------|---------:|---------:|---------:|
+| English | 1.26 | 0.210 | 0.210 |
+| Hindi | 7.72 | 1.515 | 0.592 |
+| Kannada | 21.49 | 2.621 | 0.977 |
+| Tamil | 24.07 | 2.691 | 0.993 |
+
+### XLM-Roberta
+
+| Language | Tok/Word | Tok/Char | Tok/Byte |
+|----------|---------:|---------:|---------:|
+| English | 1.40 | 0.235 | 0.234 |
+| Hindi | 1.51 | 0.296 | 0.116 |
+| Kannada | 2.51 | 0.306 | 0.114 |
+| Tamil | 2.44 | 0.273 | 0.101 |
+
+## Observations
+
+Several important observations emerge from the larger multilingual corpus.
+
+- GPT-2 produces substantially higher fertility for Indic languages than for English.
+- Kannada and Tamil exhibit particularly high Tokens per Word values under GPT-2.
+- XLM-Roberta produces much more balanced token counts across all four languages.
+- Tokens per Byte also become considerably more consistent when using XLM-Roberta.
+
+These results indicate that tokenizer vocabulary design has a much greater influence on fertility than language alone.
+
+## Choosing the Routing Metric
+
+The purpose of the denominator is to keep approximately the same quantity constant across languages.
+
+- **Tokens per Word** depends on language-specific word segmentation.
+- **Tokens per Character** removes whitespace dependence but still compares Unicode code points rather than displayed text or encoded size.
+- **Tokens per UTF-8 Byte** measures tokenization relative to the encoded input processed by the tokenizer and therefore provides a more language-independent normalization.
+
+For routing and cost estimation, **Tokens per UTF-8 Byte** is the most appropriate metric among those evaluated.
+
+## Conclusion
+
+The larger evaluation corpus confirms the trends observed using the sample corpus.
+
+The experiments demonstrate that tokenizer selection has a much greater effect on fertility measurements than language alone. Therefore, multilingual routing and cost estimation should always be evaluated using the tokenizer intended for deployment.
