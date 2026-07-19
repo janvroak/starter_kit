@@ -1,5 +1,6 @@
 from pathlib import Path
 import argparse
+import csv
 
 import tiktoken
 from transformers import AutoTokenizer
@@ -152,6 +153,16 @@ else:
 
 
 # -------------------------------------------------------
+# Results Directory
+# -------------------------------------------------------
+
+results_dir = Path("my_submission/partA/results")
+results_dir.mkdir(parents=True, exist_ok=True)
+
+comparison_rows = []
+
+
+# -------------------------------------------------------
 # Run Comparison
 # -------------------------------------------------------
 
@@ -176,6 +187,8 @@ for tokenizer_name, tokenizer_fn in tokenizers.items():
 
     print("-" * 90)
 
+    rows = []
+
     for language, path in languages.items():
 
         lines = read_file(path)
@@ -192,3 +205,44 @@ for tokenizer_name, tokenizer_fn in tokenizers.items():
             f"{result['tok_per_char']:>12.3f}"
             f"{result['tok_per_byte']:>12.3f}"
         )
+
+        row = {
+            "Language": language,
+            "Tokens": result["tokens"],
+            "Words": result["words"],
+            "Chars": result["chars"],
+            "Bytes": result["bytes"],
+            "Tok/Word": round(result["tok_per_word"], 2),
+            "Tok/Char": round(result["tok_per_char"], 3),
+            "Tok/Byte": round(result["tok_per_byte"], 3),
+        }
+
+        rows.append(row)
+
+        comparison_rows.append({
+            "Tokenizer": tokenizer_name,
+            **row
+        })
+
+    filename = (
+        "gpt2_results.csv"
+        if tokenizer_name == "GPT-2"
+        else "xlmr_results.csv"
+    )
+
+    with open(results_dir / filename, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=rows[0].keys())
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+with open(results_dir / "comparison_table.csv", "w", newline="", encoding="utf-8") as f:
+    writer = csv.DictWriter(f, fieldnames=comparison_rows[0].keys())
+    writer.writeheader()
+    writer.writerows(comparison_rows)
+
+
+print("\n" + "=" * 90)
+print("CSV files successfully saved!")
+print(results_dir.resolve())
+print("=" * 90)
