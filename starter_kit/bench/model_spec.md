@@ -9,7 +9,7 @@
 | d_model | 3072 |
 | attention heads (Q) | 24 |
 | KV heads (GQA) | 8 |
-| head_dim | 128 |
+| head_dim | 128 |  
 | vocab | 128k |
 | weights precision | fp16 |
 | KV cache precision | fp16 |

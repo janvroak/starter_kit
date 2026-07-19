@@ -26,3 +26,17 @@ Rather than accepting these suggestions, the issue was investigated manually by 
 AI also proposed several potential issues in `fertility.py`. Each proposed issue was treated as a hypothesis rather than a confirmed bug. Experiments were performed to verify or reject these hypotheses. For example, whitespace splitting initially appeared suspicious, but testing on the provided corpus showed that it did not affect the reported results and therefore was not reported as a bug.
 
 These experiences reinforced that AI suggestions should be treated as starting points for investigation rather than ground truth. Every experimental result and conclusion reported in this submission is based on code executed locally and verified manually.
+
+## Part B
+
+AI assisted with:
+
+- verifying KV-cache calculations
+- checking arithmetic
+- interpreting benchmark logs
+- explaining scheduler preemption
+- distinguishing reported throughput from generation goodput
+
+All numerical results were independently verified using the supplied
+model specification and benchmark log.
+

@@ -288,3 +288,91 @@ For routing and cost estimation, **Tokens per UTF-8 Byte** is the most appropria
 The larger evaluation corpus confirms the trends observed using the sample corpus.
 
 The experiments demonstrate that tokenizer selection has a much greater effect on fertility measurements than language alone. Therefore, multilingual routing and cost estimation should always be evaluated using the tokenizer intended for deployment.
+
+
+#  Part B Capacity Reconciliation
+
+## Goal
+
+Answer the four capacity reconciliation questions using the provided
+model specification and benchmark log.
+
+---
+
+## Initial hypothesis
+
+Initially assumed that throughput should continue increasing as batch
+size increases.
+
+---
+
+## Experiment 1
+
+Calculated KV-cache memory per token using:
+
+Layers × 2 × KV Heads × Head Dimension × FP16 bytes
+
+Result:
+
+114,688 bytes/token.
+
+Estimated approximately 45 concurrent 4096-token sequences.
+
+---
+
+## Observation
+
+The benchmark began preempting sequences between batch sizes 24 and 32,
+despite the theoretical estimate of ~45 sequences.
+
+---
+
+## Revision
+
+Realized that runtime memory, allocator overhead, and scheduler metadata
+reduce practical capacity below the theoretical maximum.
+
+---
+
+## Experiment 2
+
+Examined the long-context benchmark rows.
+
+Found that throughput peaks at batch size 24 and decreases afterwards.
+
+Observed:
+
+- kv_cache_util increases to 0.97
+- preempted_seqs increases from 0 → 7 → 23
+
+Conclusion:
+
+Scheduler preemption caused by KV-cache saturation reduces throughput.
+
+---
+
+## Experiment 3
+
+Verified whether reported_tok_s represented generation throughput.
+
+Computed:
+
+(24 × (3584 + 512)) / wall_clock
+
+Result exactly matched reported_tok_s.
+
+Dead end:
+
+Initially assumed reported_tok_s represented generated tokens per second.
+
+Revision:
+
+Determined that it actually counts prompt + generated tokens.
+
+Computed generation goodput independently using:
+
+1. generated_tokens / wall_clock
+
+2. reported_tok_s × (generated_tokens / total_tokens)
+
+Both produced approximately 200.9 generated tok/s.
